@@ -1,0 +1,63 @@
+# Build directories
+build/
+out/
+Debug/
+Release/
+x64/
+*.o
+*.obj
+
+# IDE files
+.vs/
+.vscode/
+*.swp
+*.swo
+.idea/
+*.user
+*.suo
+*.sdf
+*.opensdf
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake-build-*/
+*.cmake
+!CMakeLists.txt
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Qt-specific
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+*.qm
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+.qmake.stash 
