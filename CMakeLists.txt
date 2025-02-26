@@ -20,7 +20,21 @@ find_package(GTest REQUIRED)
 # Optional Qt GUI support
 option(FALCONSIM_BUILD_GUI "Build FalconSim GUI" OFF)
 if(FALCONSIM_BUILD_GUI)
-    find_package(Qt6 COMPONENTS Core Widgets Quick REQUIRED)
+    # Try to find Qt6, but don't require it
+    find_package(Qt6 COMPONENTS Core Widgets Quick QUIET)
+    if(NOT Qt6_FOUND)
+        find_package(Qt5 COMPONENTS Core Widgets Quick QUIET)
+        if(NOT Qt5_FOUND)
+            message(WARNING "Neither Qt6 nor Qt5 found - disabling GUI")
+            set(FALCONSIM_BUILD_GUI OFF)
+        else()
+            message(STATUS "Using Qt5 for GUI")
+            set(QT_VERSION_MAJOR 5)
+        endif()
+    else()
+        message(STATUS "Using Qt6 for GUI")
+        set(QT_VERSION_MAJOR 6)
+    endif()
 endif()
 
 # Main library target

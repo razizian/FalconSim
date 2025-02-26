@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>resources/falcon_icon.png</file>
+        <file>resources/compass.png</file>
+        <file>resources/artificial_horizon.png</file>
+        <file>resources/throttle_slider.png</file>
+    </qresource>
+</RCC> 
