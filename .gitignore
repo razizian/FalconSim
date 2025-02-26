@@ -60,4 +60,4 @@ ui_*.h
 *.qbs.user
 *.qbs.user.*
 *.moc
-.qmake.stash 
+.qmake.stash .cursor/
