@@ -86,6 +86,13 @@ void MainWindow::setupConnections()
     connect(ui->actionPause, &QAction::triggered, this, &MainWindow::onPauseSimulation);
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::onStopSimulation);
     
+    // Connect control panel simulation buttons
+    if (m_controlPanel) {
+        connect(m_controlPanel, &ControlPanel::startSimulation, this, &MainWindow::onStartSimulation);
+        connect(m_controlPanel, &ControlPanel::pauseSimulation, this, &MainWindow::onPauseSimulation);
+        connect(m_controlPanel, &ControlPanel::stopSimulation, this, &MainWindow::onStopSimulation);
+    }
+    
     // Network connections
     connect(m_socket, &QUdpSocket::readyRead, this, &MainWindow::onDataReceived);
     
@@ -93,6 +100,29 @@ void MainWindow::setupConnections()
     connect(m_controlPanel, &ControlPanel::throttleChanged, [this](double value) {
         // Send control commands to server if needed
         qDebug() << "Throttle:" << value;
+        
+        // For testing, update the control value directly
+        m_telemetryData.controls[0] = value;
+        updateDisplays();
+    });
+    
+    // Connect other control signals
+    connect(m_controlPanel, &ControlPanel::aileronChanged, [this](double value) {
+        qDebug() << "Aileron:" << value;
+        m_telemetryData.controls[1] = value;
+        updateDisplays();
+    });
+    
+    connect(m_controlPanel, &ControlPanel::elevatorChanged, [this](double value) {
+        qDebug() << "Elevator:" << value;
+        m_telemetryData.controls[2] = value;
+        updateDisplays();
+    });
+    
+    connect(m_controlPanel, &ControlPanel::rudderChanged, [this](double value) {
+        qDebug() << "Rudder:" << value;
+        m_telemetryData.controls[3] = value;
+        updateDisplays();
     });
 }
 
@@ -181,14 +211,39 @@ void MainWindow::parseTelemetryData(const QString &data)
     }
 }
 
+void MainWindow::updateSimulation()
+{
+    if (!m_simRunning) {
+        return;
+    }
+    
+    // Simple physics model - just for demonstration
+    const double deltaT = 0.1; // 100 ms simulation step
+    
+    // Update position based on velocity
+    m_telemetryData.position[0] += m_telemetryData.velocity[0] * deltaT;
+    m_telemetryData.position[1] += m_telemetryData.velocity[1] * deltaT;
+    m_telemetryData.position[2] += m_telemetryData.velocity[2] * deltaT;
+    
+    // Update velocity based on controls
+    // Throttle affects forward velocity
+    double targetSpeed = m_telemetryData.controls[0] * 30.0; // Max speed 30 m/s
+    m_telemetryData.velocity[0] += (targetSpeed - m_telemetryData.velocity[0]) * 0.1;
+    
+    // Aileron affects roll
+    m_telemetryData.orientation[0] += (m_telemetryData.controls[1] - m_telemetryData.orientation[0]) * 0.1;
+    
+    // Elevator affects pitch
+    m_telemetryData.orientation[1] += (m_telemetryData.controls[2] - m_telemetryData.orientation[1]) * 0.1;
+    
+    // Rudder affects yaw
+    m_telemetryData.orientation[2] += (m_telemetryData.controls[3] - m_telemetryData.orientation[2]) * 0.1;
+}
+
 void MainWindow::updateDisplays()
 {
     if (m_telemetryWidget) {
-        m_telemetryWidget->updateTelemetry(
-            m_telemetryData.position,
-            m_telemetryData.velocity,
-            m_telemetryData.orientation
-        );
+        m_telemetryWidget->updateTelemetry(m_telemetryData);
     }
     
     if (m_flight3DView) {
@@ -199,7 +254,7 @@ void MainWindow::updateDisplays()
     }
     
     if (m_controlPanel) {
-        m_controlPanel->updateControlDisplay(
+        m_controlPanel->updateControlDisplays(
             m_telemetryData.controls[0],
             m_telemetryData.controls[1],
             m_telemetryData.controls[2],
@@ -212,6 +267,10 @@ void MainWindow::onUpdateTimer()
 {
     // This is called at regular intervals for smooth UI updates
     // even when telemetry data is not coming in fast enough
+    
+    // Add a call to update the simulation before updating displays
+    updateSimulation();
+    
     updateDisplays();
 }
 
@@ -220,6 +279,16 @@ void MainWindow::onStartSimulation()
     m_simRunning = true;
     statusBar()->showMessage("Simulation running");
     
+    // Update UI state
+    ui->actionStart->setEnabled(false);
+    ui->actionPause->setEnabled(true);
+    ui->actionStop->setEnabled(true);
+    
+    // Enable control panel
+    if (m_controlPanel) {
+        m_controlPanel->setEnabled(true);
+    }
+    
     // Could send start command to server if needed
 }
 
@@ -227,6 +296,11 @@ void MainWindow::onPauseSimulation()
 {
     m_simRunning = false;
     statusBar()->showMessage("Simulation paused");
+    
+    // Update UI state
+    ui->actionStart->setEnabled(true);
+    ui->actionPause->setEnabled(false);
+    ui->actionStop->setEnabled(true);
     
     // Could send pause command to server if needed
 }
@@ -239,6 +313,11 @@ void MainWindow::onStopSimulation()
     TelemetryData resetData;
     m_telemetryData = resetData;
     updateDisplays();
+    
+    // Update UI state
+    ui->actionStart->setEnabled(true);
+    ui->actionPause->setEnabled(false);
+    ui->actionStop->setEnabled(false);
     
     statusBar()->showMessage("Simulation stopped");
     

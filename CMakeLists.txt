@@ -20,10 +20,13 @@ find_package(GTest REQUIRED)
 # Optional Qt GUI support
 option(FALCONSIM_BUILD_GUI "Build FalconSim GUI" OFF)
 if(FALCONSIM_BUILD_GUI)
+    # Find OpenGL for the 3D visualization
+    find_package(OpenGL REQUIRED)
+    
     # Try to find Qt6, but don't require it
-    find_package(Qt6 COMPONENTS Core Widgets Quick QUIET)
+    find_package(Qt6 COMPONENTS Core Widgets Quick OpenGLWidgets QUIET)
     if(NOT Qt6_FOUND)
-        find_package(Qt5 COMPONENTS Core Widgets Quick QUIET)
+        find_package(Qt5 COMPONENTS Core Widgets Quick OpenGL QUIET)
         if(NOT Qt5_FOUND)
             message(WARNING "Neither Qt6 nor Qt5 found - disabling GUI")
             set(FALCONSIM_BUILD_GUI OFF)
@@ -44,7 +47,7 @@ add_library(falconsim "")
 add_subdirectory(src)
 add_subdirectory(tests)
 if(FALCONSIM_BUILD_GUI)
-    add_subdirectory(gui)
+    # GUI is already included in src/gui
 endif()
 
 # Include directories

@@ -2,7 +2,10 @@
 
 #include <QWidget>
 #include <memory>
+#include "TelemetryData.hpp"
 
+// Forward declarations
+class MainWindow;
 namespace Ui {
 class TelemetryWidget;
 }
@@ -30,6 +33,13 @@ public:
     void updateTelemetry(const double position[3],
                          const double velocity[3],
                          const double orientation[3]);
+                         
+    /**
+     * Update the telemetry display with data from a TelemetryData struct
+     * 
+     * @param data The telemetry data struct containing all telemetry information
+     */
+    void updateTelemetry(const TelemetryData& data);
 
 private:
     std::unique_ptr<Ui::TelemetryWidget> ui;

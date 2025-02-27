@@ -1,5 +1,6 @@
 #include "TelemetryWidget.hpp"
 #include "ui_TelemetryWidget.h"
+#include "TelemetryData.hpp"
 
 #include <QLabel>
 #include <QProgressBar>
@@ -20,6 +21,12 @@ TelemetryWidget::TelemetryWidget(QWidget *parent)
 
 TelemetryWidget::~TelemetryWidget()
 {
+}
+
+void TelemetryWidget::updateTelemetry(const TelemetryData& data)
+{
+    // Call the existing method with the data from the struct
+    updateTelemetry(data.position, data.velocity, data.orientation);
 }
 
 void TelemetryWidget::updateTelemetry(const double position[3],

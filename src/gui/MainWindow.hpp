@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <memory>
 #include <vector>
+#include "TelemetryData.hpp"
 
 // Forward declarations
 namespace Ui {
@@ -64,13 +65,6 @@ private:
     bool m_connected{false};
     
     // Telemetry data
-    struct TelemetryData {
-        double timestamp{0.0};
-        double position[3]{0.0, 0.0, 0.0};  // North, East, Down
-        double velocity[3]{0.0, 0.0, 0.0};  // X, Y, Z (body frame)
-        double orientation[3]{0.0, 0.0, 0.0};  // Roll, Pitch, Yaw
-        double controls[4]{0.0, 0.0, 0.0, 0.0};  // Throttle, Aileron, Elevator, Rudder
-    };
     TelemetryData m_telemetryData;
     
     // Simulation parameters
@@ -83,4 +77,5 @@ private:
     void setupConnections();
     void parseTelemetryData(const QString &data);
     void updateDisplays();
+    void updateSimulation();
 }; 

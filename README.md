@@ -21,6 +21,29 @@ A high-performance UAV simulation framework for defense, aerospace, and research
 - Google Test
 - Qt6 (optional, for GUI)
 
+## Components
+
+### Core Simulation Engine
+- Multi-threaded simulation loop
+- Time-step management
+- State handling and propagation
+
+### Physics Module
+- 6-DOF flight dynamics model
+- Aerodynamic force and moment calculations
+- Numerical integration
+
+### Network Module
+- UDP-based telemetry server
+- Real-time data streaming
+- Client connection management
+
+### GUI (Visualization)
+- Real-time telemetry visualization
+- 3D aircraft model and attitude display
+- Control inputs panel
+- Simulation control interface
+
 ## Building
 
 ```bash

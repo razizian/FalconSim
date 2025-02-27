@@ -1,30 +1,48 @@
 #include "ControlPanel.hpp"
 #include "ui_ControlPanel.h"
+#include <QDebug>
 
 ControlPanel::ControlPanel(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ControlPanel)
+    , m_updatingFromTelemetry(false)
 {
     ui->setupUi(this);
     
-    // Connect slider signals
-    connect(ui->sliderThrottle, &QSlider::valueChanged, this, &ControlPanel::onThrottleSliderChanged);
-    connect(ui->sliderAileron, &QSlider::valueChanged, this, &ControlPanel::onAileronSliderChanged);
-    connect(ui->sliderElevator, &QSlider::valueChanged, this, &ControlPanel::onElevatorSliderChanged);
-    connect(ui->sliderRudder, &QSlider::valueChanged, this, &ControlPanel::onRudderSliderChanged);
+    // Connect sliders to their handlers
+    connect(ui->sliderThrottle, &QSlider::valueChanged, this, &ControlPanel::onThrottleChanged);
+    connect(ui->sliderAileron, &QSlider::valueChanged, this, &ControlPanel::onAileronChanged);
+    connect(ui->sliderElevator, &QSlider::valueChanged, this, &ControlPanel::onElevatorChanged);
+    connect(ui->sliderRudder, &QSlider::valueChanged, this, &ControlPanel::onRudderChanged);
     
     // Connect reset button
     connect(ui->btnResetControls, &QPushButton::clicked, this, &ControlPanel::onResetControlsClicked);
+    
+    // Connect simulation control buttons
+    if (ui->btnStartSim) {
+        connect(ui->btnStartSim, &QPushButton::clicked, this, &ControlPanel::startSimulation);
+    }
+    if (ui->btnPauseSim) {
+        connect(ui->btnPauseSim, &QPushButton::clicked, this, &ControlPanel::pauseSimulation);
+    }
+    if (ui->btnStopSim) {
+        connect(ui->btnStopSim, &QPushButton::clicked, this, &ControlPanel::stopSimulation);
+    }
+    
+    // Enable sliders for user input
+    ui->sliderThrottle->setEnabled(true);
+    ui->sliderAileron->setEnabled(true);
+    ui->sliderElevator->setEnabled(true);
+    ui->sliderRudder->setEnabled(true);
 }
 
 ControlPanel::~ControlPanel()
 {
 }
 
-void ControlPanel::updateControlDisplay(double throttle, double aileron, 
-                                       double elevator, double rudder)
+void ControlPanel::updateControlDisplays(double throttle, double aileron, double elevator, double rudder)
 {
-    // Set flag to prevent feedback loops
+    // Prevent feedback loop when updating from telemetry
     m_updatingFromTelemetry = true;
     
     // Update sliders
@@ -42,7 +60,7 @@ void ControlPanel::updateControlDisplay(double throttle, double aileron,
     m_updatingFromTelemetry = false;
 }
 
-void ControlPanel::onThrottleSliderChanged(int value)
+void ControlPanel::onThrottleChanged(int value)
 {
     if (m_updatingFromTelemetry) {
         return;
@@ -54,7 +72,7 @@ void ControlPanel::onThrottleSliderChanged(int value)
     emit throttleChanged(throttleValue);
 }
 
-void ControlPanel::onAileronSliderChanged(int value)
+void ControlPanel::onAileronChanged(int value)
 {
     if (m_updatingFromTelemetry) {
         return;
@@ -66,7 +84,7 @@ void ControlPanel::onAileronSliderChanged(int value)
     emit aileronChanged(aileronValue);
 }
 
-void ControlPanel::onElevatorSliderChanged(int value)
+void ControlPanel::onElevatorChanged(int value)
 {
     if (m_updatingFromTelemetry) {
         return;
@@ -78,7 +96,7 @@ void ControlPanel::onElevatorSliderChanged(int value)
     emit elevatorChanged(elevatorValue);
 }
 
-void ControlPanel::onRudderSliderChanged(int value)
+void ControlPanel::onRudderChanged(int value)
 {
     if (m_updatingFromTelemetry) {
         return;

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+// Add the compatibility header for Qt6
+#include <QOpenGLFunctions_2_1>
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QQuaternion>
@@ -35,10 +38,14 @@ protected:
     
     // Mouse interaction
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
 private:
+    // Add OpenGL compatibility functions
+    QOpenGLFunctions_2_1 *m_glFunctions;
+    
     // Aircraft state
     QVector3D m_aircraftPosition{0.0f, 0.0f, 0.0f};
     QQuaternion m_aircraftOrientation{};
