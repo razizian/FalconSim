@@ -30,7 +30,7 @@ public:
     ~MainWindow();
 
     /**
-     * Connect to a telemetry server
+     * Connect to telemetry server
      * @param host Hostname or IP address
      * @param port UDP port number
      */
